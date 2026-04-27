@@ -15,6 +15,10 @@ jest.mock('pdfjs-dist', () => ({
 }))
 
 describe('renderPdfFirstPage', () => {
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
   it('retorna uma string dataURL', async () => {
     const mockFile = new File(['%PDF-1.4'], 'test.pdf', { type: 'application/pdf' })
     Object.defineProperty(mockFile, 'arrayBuffer', {

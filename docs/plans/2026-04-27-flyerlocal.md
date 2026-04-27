@@ -61,71 +61,13 @@ Adicionar em `package.json` scripts:
 "test:watch": "jest --watch"
 ```
 
-**Step 4: Substituir `tailwind.config.ts` pelo design system do projeto**
+**Step 4: Design tokens — Tailwind v4 approach**
 
-```typescript
-import type { Config } from 'tailwindcss'
-
-const config: Config = {
-  content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}'],
-  darkMode: 'class',
-  theme: {
-    extend: {
-      colors: {
-        'surface-container-lowest': '#ffffff',
-        'surface-container-low': '#f6f3f2',
-        'surface-container': '#f0edec',
-        'surface-container-high': '#ebe7e7',
-        'on-surface': '#1c1b1b',
-        'on-surface-variant': '#494454',
-        'primary': '#4501a9',
-        'primary-container': '#5d2ec0',
-        'primary-fixed': '#e9ddff',
-        'on-primary': '#ffffff',
-        'on-primary-container': '#cdb8ff',
-        'outline': '#7a7485',
-        'outline-variant': '#cbc3d6',
-        'tertiary': '#003e55',
-        'tertiary-container': '#005774',
-        'tertiary-fixed': '#c2e8ff',
-        'on-tertiary-fixed': '#001e2b',
-        'on-tertiary-container': '#69ceff',
-        'background': '#fcf9f8',
-        'surface': '#fcf9f8',
-      },
-      borderRadius: {
-        DEFAULT: '0.25rem',
-        lg: '0.5rem',
-        xl: '0.75rem',
-        full: '9999px',
-      },
-      spacing: {
-        xs: '4px',
-        sm: '12px',
-        md: '24px',
-        lg: '40px',
-        xl: '64px',
-        gutter: '24px',
-        margin: '20px',
-        base: '8px',
-      },
-      fontFamily: {
-        sans: ['Plus Jakarta Sans', 'sans-serif'],
-      },
-      fontSize: {
-        h1: ['32px', { lineHeight: '1.2', letterSpacing: '-0.01em', fontWeight: '700' }],
-        h3: ['20px', { lineHeight: '1.4', fontWeight: '600' }],
-        'label-md': ['14px', { lineHeight: '1.2', fontWeight: '600' }],
-        caption: ['12px', { lineHeight: '1.4', fontWeight: '500' }],
-        'body-md': ['16px', { lineHeight: '1.6', fontWeight: '400' }],
-      },
-    },
-  },
-  plugins: [],
-}
-
-export default config
-```
+> **NOTE (updated 2026-04-27):** This project uses **Tailwind CSS v4**, which does NOT use a `tailwind.config.ts` file for design tokens. Do NOT create or reference a `tailwind.config.ts` file.
+>
+> In Tailwind v4, all custom design tokens (colors, spacing, font sizes, border radii, font families) are defined via the `@theme` block directly in `app/globals.css`. Font-weight and letter-spacing companions (`--text-*--font-weight`, `--text-*--letter-spacing`) are NOT supported in `@theme` — they are silently ignored. Instead, apply those styles via `@layer base` utility class rules.
+>
+> Future tasks that need new design tokens should add them to the `@theme` block in `app/globals.css`. If a font-weight or letter-spacing is needed for a custom text size utility, add a corresponding rule in the `@layer base` block in that same file.
 
 **Step 5: Substituir `app/globals.css`**
 

@@ -1,5 +1,5 @@
 'use client'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { UploadZone } from '@/components/UploadZone'
 import { FlyerPreview } from '@/components/FlyerPreview'
 import { AddressForm } from '@/components/AddressForm'
@@ -13,10 +13,24 @@ export default function Home() {
   const [address, setAddress] = useState({ nome: '', rua: '', numero: '' })
   const [color, setColor] = useState('#ffffff')
   const [fontSize, setFontSize] = useState(18)
+  const [isDownloading, setIsDownloading] = useState(false)
   const { position, setPosition, reset } = useDrag()
   const flyerWrapperRef = useRef<HTMLDivElement>(null)
+  const blobUrlRef = useRef<string | null>(null)
+
+  // Revoke blob URL when component unmounts
+  useEffect(() => {
+    return () => {
+      if (blobUrlRef.current) URL.revokeObjectURL(blobUrlRef.current)
+    }
+  }, [])
 
   async function handleFile(file: File | null) {
+    // Revoke previous blob URL to free memory
+    if (blobUrlRef.current) {
+      URL.revokeObjectURL(blobUrlRef.current)
+      blobUrlRef.current = null
+    }
     if (!file) {
       setImageSrc(null)
       reset()
@@ -27,7 +41,9 @@ export default function Home() {
       const dataUrl = await renderPdfFirstPage(file)
       setImageSrc(dataUrl)
     } else {
-      setImageSrc(URL.createObjectURL(file))
+      const url = URL.createObjectURL(file)
+      blobUrlRef.current = url
+      setImageSrc(url)
     }
     reset()
   }
@@ -44,17 +60,21 @@ export default function Home() {
     position !== null
 
   async function handleDownload() {
-    if (!flyerWrapperRef.current) return
-    // Temporarily hide dashed border on overlay for clean export
+    if (!flyerWrapperRef.current || isDownloading) return
+    setIsDownloading(true)
     const overlayEl = flyerWrapperRef.current.querySelector<HTMLElement>('[data-testid="text-overlay"]')
     if (overlayEl) {
       overlayEl.style.border = 'none'
       overlayEl.style.background = 'transparent'
     }
-    await exportAsImage(flyerWrapperRef.current)
-    if (overlayEl) {
-      overlayEl.style.border = '2px dashed rgba(109,63,207,0.7)'
-      overlayEl.style.background = 'rgba(109,63,207,0.06)'
+    try {
+      await exportAsImage(flyerWrapperRef.current)
+    } finally {
+      if (overlayEl) {
+        overlayEl.style.border = '2px dashed rgba(109,63,207,0.7)'
+        overlayEl.style.background = 'rgba(109,63,207,0.06)'
+      }
+      setIsDownloading(false)
     }
   }
 
@@ -117,7 +137,7 @@ export default function Home() {
             <AddressForm values={address} onChange={handleAddressChange} />
 
             {/* Download */}
-            <DownloadButton ready={isReady} onDownload={handleDownload} />
+            <DownloadButton ready={isReady} loading={isDownloading} onDownload={handleDownload} />
           </form>
         </div>
 

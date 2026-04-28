@@ -1,17 +1,26 @@
 'use client'
 import { useState, useRef } from 'react'
 
+const MAX_SIZE_BYTES = 5 * 1024 * 1024
+
 interface Props {
   onFile: (file: File | null) => void
 }
 
 export function UploadZone({ onFile }: Props) {
   const [fileName, setFileName] = useState<string | null>(null)
+  const [sizeError, setSizeError] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0] ?? null
     if (file) {
+      if (file.size > MAX_SIZE_BYTES) {
+        setSizeError(true)
+        if (inputRef.current) inputRef.current.value = ''
+        return
+      }
+      setSizeError(false)
       setFileName(file.name)
       onFile(file)
     }
@@ -42,6 +51,9 @@ export function UploadZone({ onFile }: Props) {
           </div>
           <h3 className="text-h3 text-on-surface mb-1">Arraste sua arte aqui</h3>
           <p className="text-caption text-outline">JPG, PNG ou PDF (Máx. 5MB)</p>
+          {sizeError && (
+            <p className="text-[12px] text-red-600 mt-2 font-medium">Arquivo muito grande. Tamanho máximo: 5MB.</p>
+          )}
         </div>
       ) : (
         <div className="flex items-center gap-3 bg-primary-fixed rounded-xl px-4 py-3">

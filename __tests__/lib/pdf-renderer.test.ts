@@ -8,6 +8,7 @@ jest.mock('pdfjs-dist', () => ({
         getViewport: jest.fn(() => ({ width: 100, height: 200 })),
         render: jest.fn(() => ({ promise: Promise.resolve() })),
       })),
+      destroy: jest.fn(),
     }),
   })),
   GlobalWorkerOptions: { workerSrc: '' },

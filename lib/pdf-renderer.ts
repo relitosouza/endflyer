@@ -1,11 +1,12 @@
 import * as pdfjsLib from 'pdfjs-dist'
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.mjs',
-  import.meta.url
-).toString()
-
 export async function renderPdfFirstPage(file: File): Promise<string> {
+  // Set workerSrc inside the function so this module is safe to import in any context
+  pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+    'pdfjs-dist/build/pdf.worker.mjs',
+    import.meta.url
+  ).toString()
+
   const arrayBuffer = await file.arrayBuffer()
   const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
   const page = await pdf.getPage(1)
@@ -20,5 +21,7 @@ export async function renderPdfFirstPage(file: File): Promise<string> {
   // @ts-expect-error: pdfjs-dist v5 type for render expects RenderParameters, runtime is compatible
   await page.render({ canvasContext: ctx, viewport }).promise
 
-  return canvas.toDataURL('image/png')
+  const dataUrl = canvas.toDataURL('image/png')
+  pdf.destroy()
+  return dataUrl
 }

@@ -246,20 +246,16 @@ export default function Home() {
                   <AddressForm values={address} onChange={handleAddressChange} />
                 </div>
 
-                {/* StyleControls */}
+                {/* Button "Adicionar Texto" */}
                 <div className="lg:col-span-5 lg:col-start-1 lg:row-start-3 order-4 w-full">
-                  <StyleControls
-                    color={currentStyles.color}
-                    fontSize={currentStyles.fontSize}
-                    fontFamily={currentStyles.fontFamily}
-                    textAlign={currentStyles.textAlign}
-                    onColorChange={handleColorChange}
-                    onFontSizeChange={handleFontSizeChange}
-                    onFontFamilyChange={handleFontFamilyChange}
-                    onTextAlignChange={handleTextAlignChange}
-                    onAddText={handleAddText}
-                    onReset={reset}
-                  />
+                  <button
+                    type="button"
+                    onClick={handleAddText}
+                    className="flex items-center justify-center gap-1 bg-primary-fixed text-primary font-semibold rounded-xl px-4 py-3 text-sm hover:bg-primary-container hover:text-on-primary transition-colors w-full"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">add_box</span>
+                    Adicionar Texto
+                  </button>
                 </div>
 
                 {/* Conditional text editor for extra texts */}
@@ -287,8 +283,23 @@ export default function Home() {
                   </div>
                 )}
 
-                {/* Download */}
+                {/* StyleControls */}
                 <div className="lg:col-span-5 lg:col-start-1 lg:row-start-5 order-6 w-full">
+                  <StyleControls
+                    color={currentStyles.color}
+                    fontSize={currentStyles.fontSize}
+                    fontFamily={currentStyles.fontFamily}
+                    textAlign={currentStyles.textAlign}
+                    onColorChange={handleColorChange}
+                    onFontSizeChange={handleFontSizeChange}
+                    onFontFamilyChange={handleFontFamilyChange}
+                    onTextAlignChange={handleTextAlignChange}
+                    onReset={reset}
+                  />
+                </div>
+
+                {/* Download */}
+                <div className="lg:col-span-5 lg:col-start-1 lg:row-start-6 order-7 w-full">
                   <DownloadButton ready={isReady} loading={isDownloading} onDownload={handleDownload} onShare={handleShare} />
                 </div>
               </>

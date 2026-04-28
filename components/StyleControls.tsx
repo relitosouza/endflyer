@@ -27,16 +27,7 @@ export function StyleControls({
 }: Props) {
   return (
     <div className="flex flex-wrap gap-3 items-center pt-1">
-      {onAddText && (
-        <button
-          type="button"
-          onClick={onAddText}
-          className="flex items-center gap-1 bg-primary-fixed text-primary font-semibold rounded-xl px-3 py-2 text-sm hover:bg-primary-container hover:text-on-primary transition-colors"
-        >
-          <span className="material-symbols-outlined text-[18px]">add_box</span>
-          Adicionar Texto
-        </button>
-      )}
+
 
       <div className="flex items-center gap-2 bg-surface-container rounded-xl px-3 py-2">
         <span className="material-symbols-outlined text-[18px] text-outline">palette</span>

@@ -14,12 +14,10 @@ interface Props {
 }
 
 export function TextOverlay({ nome, rua, numero, color, fontSize, position, onDrag, containerRef }: Props) {
-  const isDragging = useRef(false)
   const dragOffset = useRef({ x: 0, y: 0 })
 
   function handleMouseDown(e: React.MouseEvent) {
     if (!containerRef.current) return
-    isDragging.current = true
     const rect = containerRef.current.getBoundingClientRect()
     dragOffset.current = {
       x: e.clientX - rect.left - position.x,
@@ -38,7 +36,6 @@ export function TextOverlay({ nome, rua, numero, color, fontSize, position, onDr
     }
 
     function onUp() {
-      isDragging.current = false
       document.removeEventListener('mousemove', onMove)
       document.removeEventListener('mouseup', onUp)
     }
@@ -56,6 +53,7 @@ export function TextOverlay({ nome, rua, numero, color, fontSize, position, onDr
       y: touch.clientY - rect.top - position.y,
     }
     e.stopPropagation()
+    e.preventDefault()
 
     function onTouchMove(ev: TouchEvent) {
       if (!containerRef.current) return

@@ -260,6 +260,7 @@ export default function Home() {
                         onUpdateExtraText={(id, updated) => {
                           setExtraTexts(prev => prev.map(t => t.id === id ? { ...t, ...updated } : t))
                         }}
+                        onFontSizeChange={(size) => setFontSize(size)}
                       />
                     </div>
 

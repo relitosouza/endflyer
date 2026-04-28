@@ -31,6 +31,7 @@ interface Props {
   selectedId: string
   onSelect: (id: string) => void
   onUpdateExtraText: (id: string, updated: any) => void
+  onFontSizeChange?: (size: number) => void
 }
 
 export function FlyerPreview({
@@ -43,6 +44,7 @@ export function FlyerPreview({
   selectedId,
   onSelect,
   onUpdateExtraText,
+  onFontSizeChange,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -96,6 +98,7 @@ export function FlyerPreview({
             containerRef={containerRef as React.RefObject<HTMLDivElement>}
             isSelected={selectedId === 'address'}
             onClick={() => onSelect('address')}
+            onFontSizeChange={onFontSizeChange}
           />
         )}
 

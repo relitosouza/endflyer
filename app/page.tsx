@@ -12,7 +12,7 @@ export default function Home() {
   const [imageSrc, setImageSrc] = useState<string | null>(null)
   const [address, setAddress] = useState({ nome: '', rua: '', numero: '' })
   const [color, setColor] = useState('#ffffff')
-  const [fontSize, setFontSize] = useState(18)
+  const [fontSize, setFontSize] = useState(14)
   const [fontFamily, setFontFamily] = useState('Plus Jakarta Sans')
   const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right'>('center')
   const [extraTexts, setExtraTexts] = useState<Array<{

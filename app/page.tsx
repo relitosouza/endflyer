@@ -253,7 +253,7 @@ export default function Home() {
                         position={position}
                         onPlace={setPosition}
                         onDrag={setPosition}
-                        overlayProps={{ ...address, ...currentStyles }}
+                        overlayProps={{ ...address, color, fontSize, fontFamily, textAlign }}
                         extraTexts={extraTexts}
                         selectedId={selectedId}
                         onSelect={setSelectedId}

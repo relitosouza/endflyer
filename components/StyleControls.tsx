@@ -50,19 +50,7 @@ export function StyleControls({
         />
       </div>
 
-      <div className="flex items-center gap-2 bg-surface-container rounded-xl px-3 py-2">
-        <span className="material-symbols-outlined text-[18px] text-outline">format_size</span>
-        <input
-          data-testid="font-size-input"
-          type="number"
-          value={fontSize}
-          min={10}
-          max={72}
-          onChange={(e) => onFontSizeChange(Number(e.target.value))}
-          className="w-12 text-center bg-transparent border-none text-sm font-semibold focus:outline-none"
-        />
-        <span className="text-xs text-outline">px</span>
-      </div>
+
 
       <div className="flex items-center gap-2 bg-surface-container rounded-xl px-3 py-2">
         <span className="material-symbols-outlined text-[18px] text-outline">font_download</span>

@@ -245,7 +245,7 @@ export default function Home() {
             {imageSrc ? (
               <>
                 {/* Preview on the right for Desktop */}
-                <div className="lg:col-span-7 lg:col-start-6 lg:row-start-1 lg:row-span-4 order-2 w-full max-w-md mx-auto lg:max-w-none">
+                <div className="lg:col-span-7 lg:col-start-6 lg:row-start-1 lg:row-span-5 order-2 w-full max-w-md mx-auto lg:max-w-none">
                   <div className="lg:sticky lg:top-24 space-y-6">
                     <div ref={flyerWrapperRef} className="w-full shadow-sm rounded-xl overflow-hidden bg-slate-50 border border-slate-100">
                       <FlyerPreview
@@ -277,8 +277,13 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* StyleControls */}
+                {/* Address fields */}
                 <div className="lg:col-span-5 lg:col-start-1 lg:row-start-2 order-3 w-full">
+                  <AddressForm values={address} onChange={handleAddressChange} />
+                </div>
+
+                {/* StyleControls */}
+                <div className="lg:col-span-5 lg:col-start-1 lg:row-start-3 order-4 w-full">
                   <StyleControls
                     color={currentStyles.color}
                     fontSize={currentStyles.fontSize}
@@ -295,7 +300,7 @@ export default function Home() {
 
                 {/* Conditional text editor for extra texts */}
                 {selectedId !== 'address' && activeExtraText && (
-                  <div className="lg:col-span-5 lg:col-start-1 lg:row-start-4 order-3 w-full bg-violet-50/50 rounded-2xl p-4 border border-violet-100 space-y-2">
+                  <div className="lg:col-span-5 lg:col-start-1 lg:row-start-4 order-5 w-full bg-violet-50/50 rounded-2xl p-4 border border-violet-100 space-y-2">
                     <label className="text-label-md text-violet-900">Editar Texto Extra</label>
                     <input
                       type="text"
@@ -318,13 +323,8 @@ export default function Home() {
                   </div>
                 )}
 
-                {/* Address fields */}
-                <div className="lg:col-span-5 lg:col-start-1 lg:row-start-3 order-4 w-full">
-                  <AddressForm values={address} onChange={handleAddressChange} />
-                </div>
-
                 {/* Download */}
-                <div className="lg:col-span-5 lg:col-start-1 lg:row-start-5 order-5 w-full">
+                <div className="lg:col-span-5 lg:col-start-1 lg:row-start-5 order-6 w-full">
                   <DownloadButton ready={isReady} loading={isDownloading} onDownload={handleDownload} onShare={handleShare} />
                 </div>
               </>

@@ -5,12 +5,13 @@ interface Props {
   loading?: boolean
   onDownload: () => void
   onShare?: () => void
+  onPrint4?: () => void
 }
 
-export function DownloadButton({ ready, loading = false, onDownload, onShare }: Props) {
+export function DownloadButton({ ready, loading = false, onDownload, onShare, onPrint4 }: Props) {
   const isDisabled = !ready || loading
   return (
-    <div className="pt-4 flex flex-col sm:flex-row gap-3">
+    <div className="pt-4 flex flex-col sm:flex-row flex-wrap gap-3">
       <button
         type="button"
         disabled={isDisabled}
@@ -39,7 +40,7 @@ export function DownloadButton({ ready, loading = false, onDownload, onShare }: 
           type="button"
           disabled={isDisabled}
           onClick={onShare}
-          className={`sm:w-auto bg-white border-2 border-primary-container text-primary-container font-semibold text-[16px] py-4 px-6 rounded-xl flex items-center justify-center gap-3 transition-all
+          className={`sm:w-auto bg-white border-2 border-primary-container text-primary font-semibold text-[16px] py-4 px-6 rounded-xl flex items-center justify-center gap-3 transition-all
             ${isDisabled
               ? 'opacity-50 cursor-not-allowed'
               : 'hover:bg-primary-fixed/20 cursor-pointer'
@@ -47,6 +48,22 @@ export function DownloadButton({ ready, loading = false, onDownload, onShare }: 
         >
           <span className="material-symbols-outlined">share</span>
           Compartilhar
+        </button>
+      )}
+
+      {onPrint4 && (
+        <button
+          type="button"
+          disabled={isDisabled}
+          onClick={onPrint4}
+          className={`sm:w-auto bg-white border-2 border-primary-container text-primary font-semibold text-[16px] py-4 px-6 rounded-xl flex items-center justify-center gap-3 transition-all
+            ${isDisabled
+              ? 'opacity-50 cursor-not-allowed'
+              : 'hover:bg-primary-fixed/20 cursor-pointer'
+            }`}
+        >
+          <span className="material-symbols-outlined">print</span>
+          Imprimir (4x A4)
         </button>
       )}
     </div>

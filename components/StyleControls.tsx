@@ -41,7 +41,25 @@ export function StyleControls({
         />
       </div>
 
-
+      <div className="hidden md:flex items-center gap-2 bg-surface-container rounded-xl px-3 py-2">
+        <span className="material-symbols-outlined text-[18px] text-outline">format_size</span>
+        <span className="text-sm text-on-surface-variant font-medium">Tamanho</span>
+        <button
+          type="button"
+          onClick={() => onFontSizeChange(Math.max(8, fontSize - 2))}
+          className="w-8 h-8 flex items-center justify-center bg-white rounded-xl border border-slate-200 text-slate-700 font-bold hover:bg-slate-100 active:bg-slate-200 transition-colors"
+        >
+          -
+        </button>
+        <span className="text-sm font-semibold min-w-[20px] text-center">{fontSize}</span>
+        <button
+          type="button"
+          onClick={() => onFontSizeChange(Math.min(100, fontSize + 2))}
+          className="w-8 h-8 flex items-center justify-center bg-white rounded-xl border border-slate-200 text-slate-700 font-bold hover:bg-slate-100 active:bg-slate-200 transition-colors"
+        >
+          +
+        </button>
+      </div>
 
       <div className="flex items-center gap-2 bg-surface-container rounded-xl px-3 py-2">
         <span className="material-symbols-outlined text-[18px] text-outline">font_download</span>

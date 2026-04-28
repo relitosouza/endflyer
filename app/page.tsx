@@ -166,6 +166,33 @@ export default function Home() {
     }
   }
 
+  async function handlePrint() {
+    const { print4PerPage } = await import('@/lib/export')
+    if (!flyerWrapperRef.current || isDownloading) return
+    setIsDownloading(true)
+
+    const canvasEl = flyerWrapperRef.current.querySelector<HTMLElement>('[data-testid="flyer-canvas"]')
+    if (!canvasEl) {
+      setIsDownloading(false)
+      return
+    }
+
+    const overlayEls = canvasEl.querySelectorAll<HTMLElement>('[data-testid="text-overlay"]')
+    overlayEls.forEach(el => {
+      el.style.border = 'none'
+      el.style.background = 'transparent'
+    })
+    try {
+      await print4PerPage(canvasEl)
+    } finally {
+      overlayEls.forEach(el => {
+        el.style.border = ''
+        el.style.background = ''
+      })
+      setIsDownloading(false)
+    }
+  }
+
   return (
     <div className="text-on-surface min-h-screen pb-32 md:pb-12 bg-slate-50/50">
       {/* TopAppBar */}
@@ -300,7 +327,7 @@ export default function Home() {
 
                 {/* Download */}
                 <div className="lg:col-span-5 lg:col-start-1 lg:row-start-6 order-7 w-full">
-                  <DownloadButton ready={isReady} loading={isDownloading} onDownload={handleDownload} onShare={handleShare} />
+                  <DownloadButton ready={isReady} loading={isDownloading} onDownload={handleDownload} onShare={handleShare} onPrint4={handlePrint} />
                 </div>
               </>
             ) : null}

@@ -175,7 +175,7 @@ export function TextOverlay({ nome, rua, numero, color, fontSize, fontFamily, te
       <div style={{ fontWeight: 700, fontSize: `${fontSize}px`, color, lineHeight: 1.2, whiteSpace: 'nowrap' }}>
         {nome}
       </div>
-      <div style={{ fontWeight: 400, fontSize: '14px', color, lineHeight: 1.4, whiteSpace: 'nowrap' }}>
+      <div style={{ fontWeight: 400, fontSize: `${fontSize}px`, color, lineHeight: 1.4, whiteSpace: 'nowrap' }}>
         {[rua, numero].filter(Boolean).join(', ')}
       </div>
     </div>

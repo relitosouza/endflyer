@@ -9,6 +9,8 @@ interface OverlayProps {
   numero: string
   color: string
   fontSize: number
+  fontFamily: string
+  textAlign: 'left' | 'center' | 'right'
 }
 
 interface Props {
@@ -17,16 +19,39 @@ interface Props {
   onPlace: (pos: Position) => void
   onDrag: (pos: Position) => void
   overlayProps: OverlayProps
+  extraTexts: Array<{
+    id: string
+    text: string
+    position: { x: number; y: number }
+    fontSize: number
+    color: string
+    fontFamily: string
+    textAlign: 'left' | 'center' | 'right'
+  }>
+  selectedId: string
+  onSelect: (id: string) => void
+  onUpdateExtraText: (id: string, updated: any) => void
 }
 
-export function FlyerPreview({ imageSrc, position, onPlace, onDrag, overlayProps }: Props) {
+export function FlyerPreview({
+  imageSrc,
+  position,
+  onPlace,
+  onDrag,
+  overlayProps,
+  extraTexts,
+  selectedId,
+  onSelect,
+  onUpdateExtraText,
+}: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
 
   function handleClick(e: React.MouseEvent<HTMLDivElement>) {
     if (!containerRef.current) return
     const rect = containerRef.current.getBoundingClientRect()
-    // Offset by half the overlay's approximate width/height so the click lands in the center of the text block
-    onPlace({ x: e.clientX - rect.left - 60, y: e.clientY - rect.top - 20 })
+    const x = ((e.clientX - rect.left) / rect.width) * 100
+    const y = ((e.clientY - rect.top) / rect.height) * 100
+    onPlace({ x, y })
   }
 
   return (
@@ -60,14 +85,36 @@ export function FlyerPreview({ imageSrc, position, onPlace, onDrag, overlayProps
               Clique para posicionar
             </span>
           </div>
-        ) : (
+        ) : null}
+
+        {position && (
           <TextOverlay
             {...overlayProps}
             position={position}
             onDrag={onDrag}
             containerRef={containerRef as React.RefObject<HTMLDivElement>}
+            isSelected={selectedId === 'address'}
+            onClick={() => onSelect('address')}
           />
         )}
+
+        {extraTexts.map((text) => (
+          <TextOverlay
+            key={text.id}
+            nome={text.text}
+            rua=""
+            numero=""
+            color={text.color}
+            fontSize={text.fontSize}
+            fontFamily={text.fontFamily}
+            textAlign={text.textAlign}
+            position={text.position}
+            isSelected={selectedId === text.id}
+            onClick={() => onSelect(text.id)}
+            onDrag={(pos) => onUpdateExtraText(text.id, { position: pos })}
+            containerRef={containerRef as React.RefObject<HTMLDivElement>}
+          />
+        ))}
       </div>
     </div>
   )

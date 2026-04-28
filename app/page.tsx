@@ -13,6 +13,18 @@ export default function Home() {
   const [address, setAddress] = useState({ nome: '', rua: '', numero: '' })
   const [color, setColor] = useState('#ffffff')
   const [fontSize, setFontSize] = useState(18)
+  const [fontFamily, setFontFamily] = useState('Plus Jakarta Sans')
+  const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right'>('center')
+  const [extraTexts, setExtraTexts] = useState<Array<{
+    id: string
+    text: string
+    position: { x: number; y: number }
+    fontSize: number
+    color: string
+    fontFamily: string
+    textAlign: 'left' | 'center' | 'right'
+  }>>([])
+  const [selectedId, setSelectedId] = useState<string>('address')
   const [isDownloading, setIsDownloading] = useState(false)
   const { position, setPosition, reset } = useDrag()
   const flyerWrapperRef = useRef<HTMLDivElement>(null)
@@ -25,8 +37,46 @@ export default function Home() {
     }
   }, [])
 
+  // Load draft on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('flyer_draft')
+    if (saved) {
+      try {
+        const data = JSON.parse(saved)
+        if (data.address) setAddress(prev => ({ ...prev, ...data.address }))
+        if (data.color) setColor(data.color)
+        if (data.fontSize) setFontSize(data.fontSize)
+        if (data.fontFamily) setFontFamily(data.fontFamily)
+        if (data.textAlign) setTextAlign(data.textAlign)
+        if (data.position) setPosition(data.position)
+        if (data.extraTexts) setExtraTexts(data.extraTexts)
+        if (data.imageSrc) setImageSrc(data.imageSrc)
+      } catch (e) {
+        console.error('Erro ao carregar rascunho', e)
+      }
+    }
+  }, [])
+
+  // Save draft on update
+  useEffect(() => {
+    const data = {
+      address,
+      color,
+      fontSize,
+      fontFamily,
+      textAlign,
+      position,
+      extraTexts,
+      imageSrc
+    }
+    try {
+      localStorage.setItem('flyer_draft', JSON.stringify(data))
+    } catch (e) {
+      console.warn('Could not save draft to localStorage. LocalStorage limit might be exceeded.', e)
+    }
+  }, [address, color, fontSize, fontFamily, textAlign, position, extraTexts, imageSrc])
+
   async function handleFile(file: File | null) {
-    // Revoke previous blob URL to free memory
     if (blobUrlRef.current) {
       URL.revokeObjectURL(blobUrlRef.current)
       blobUrlRef.current = null
@@ -52,28 +102,89 @@ export default function Home() {
     setAddress((prev) => ({ ...prev, [field]: value }))
   }
 
+  function handleAddText() {
+    const newText = {
+      id: Date.now().toString(),
+      text: 'Texto Extra',
+      position: { x: 50, y: 50 },
+      fontSize: 20,
+      color: '#ffffff',
+      fontFamily: 'Plus Jakarta Sans',
+      textAlign: 'center' as const,
+    }
+    setExtraTexts((prev) => [...prev, newText])
+    setSelectedId(newText.id)
+  }
+
+  const activeExtraText = extraTexts.find(t => t.id === selectedId)
+  const currentStyles = selectedId === 'address'
+    ? { color, fontSize, fontFamily, textAlign }
+    : activeExtraText
+      ? { color: activeExtraText.color, fontSize: activeExtraText.fontSize, fontFamily: activeExtraText.fontFamily, textAlign: activeExtraText.textAlign }
+      : { color, fontSize, fontFamily, textAlign }
+
+  function handleColorChange(c: string) {
+    if (selectedId === 'address') setColor(c)
+    else setExtraTexts(prev => prev.map(t => t.id === selectedId ? { ...t, color: c } : t))
+  }
+
+  function handleFontSizeChange(s: number) {
+    if (selectedId === 'address') setFontSize(s)
+    else setExtraTexts(prev => prev.map(t => t.id === selectedId ? { ...t, fontSize: s } : t))
+  }
+
+  function handleFontFamilyChange(f: string) {
+    if (selectedId === 'address') setFontFamily(f)
+    else setExtraTexts(prev => prev.map(t => t.id === selectedId ? { ...t, fontFamily: f } : t))
+  }
+
+  function handleTextAlignChange(a: 'left' | 'center' | 'right') {
+    if (selectedId === 'address') setTextAlign(a)
+    else setExtraTexts(prev => prev.map(t => t.id === selectedId ? { ...t, textAlign: a } : t))
+  }
+
   const isReady =
     !!imageSrc &&
-    address.nome.trim() !== '' &&
-    address.rua.trim() !== '' &&
-    address.numero.trim() !== '' &&
+    (address.nome || '').trim() !== '' &&
+    (address.rua || '').trim() !== '' &&
+    (address.numero || '').trim() !== '' &&
     position !== null
 
   async function handleDownload() {
     if (!flyerWrapperRef.current || isDownloading) return
     setIsDownloading(true)
-    const overlayEl = flyerWrapperRef.current.querySelector<HTMLElement>('[data-testid="text-overlay"]')
-    if (overlayEl) {
-      overlayEl.style.border = 'none'
-      overlayEl.style.background = 'transparent'
-    }
+    const overlayEls = flyerWrapperRef.current.querySelectorAll<HTMLElement>('[data-testid="text-overlay"]')
+    overlayEls.forEach(el => {
+      el.style.border = 'none'
+      el.style.background = 'transparent'
+    })
     try {
       await exportAsImage(flyerWrapperRef.current)
     } finally {
-      if (overlayEl) {
-        overlayEl.style.border = '2px dashed rgba(109,63,207,0.7)'
-        overlayEl.style.background = 'rgba(109,63,207,0.06)'
-      }
+      overlayEls.forEach(el => {
+        el.style.border = ''
+        el.style.background = ''
+      })
+      setIsDownloading(false)
+    }
+  }
+
+  async function handleShare() {
+    const { shareAsImage } = await import('@/lib/export')
+    if (!flyerWrapperRef.current || isDownloading) return
+    setIsDownloading(true)
+    const overlayEls = flyerWrapperRef.current.querySelectorAll<HTMLElement>('[data-testid="text-overlay"]')
+    overlayEls.forEach(el => {
+      el.style.border = 'none'
+      el.style.background = 'transparent'
+    })
+    try {
+      await shareAsImage(flyerWrapperRef.current)
+    } finally {
+      overlayEls.forEach(el => {
+        el.style.border = ''
+        el.style.background = ''
+      })
       setIsDownloading(false)
     }
   }
@@ -138,7 +249,13 @@ export default function Home() {
                         position={position}
                         onPlace={setPosition}
                         onDrag={setPosition}
-                        overlayProps={{ ...address, color, fontSize }}
+                        overlayProps={{ ...address, ...currentStyles }}
+                        extraTexts={extraTexts}
+                        selectedId={selectedId}
+                        onSelect={setSelectedId}
+                        onUpdateExtraText={(id, updated) => {
+                          setExtraTexts(prev => prev.map(t => t.id === id ? { ...t, ...updated } : t))
+                        }}
                       />
                     </div>
 
@@ -159,13 +276,43 @@ export default function Home() {
                 {/* StyleControls */}
                 <div className="lg:col-span-5 lg:col-start-1 lg:row-start-2 order-3 w-full">
                   <StyleControls
-                    color={color}
-                    fontSize={fontSize}
-                    onColorChange={setColor}
-                    onFontSizeChange={setFontSize}
+                    color={currentStyles.color}
+                    fontSize={currentStyles.fontSize}
+                    fontFamily={currentStyles.fontFamily}
+                    textAlign={currentStyles.textAlign}
+                    onColorChange={handleColorChange}
+                    onFontSizeChange={handleFontSizeChange}
+                    onFontFamilyChange={handleFontFamilyChange}
+                    onTextAlignChange={handleTextAlignChange}
+                    onAddText={handleAddText}
                     onReset={reset}
                   />
                 </div>
+
+                {/* Conditional text editor for extra texts */}
+                {selectedId !== 'address' && activeExtraText && (
+                  <div className="lg:col-span-5 lg:col-start-1 lg:row-start-4 order-3 w-full bg-violet-50/50 rounded-2xl p-4 border border-violet-100 space-y-2">
+                    <label className="text-label-md text-violet-900">Editar Texto Extra</label>
+                    <input
+                      type="text"
+                      value={activeExtraText.text}
+                      onChange={(e) => {
+                        setExtraTexts(prev => prev.map(t => t.id === selectedId ? { ...t, text: e.target.value } : t))
+                      }}
+                      className="w-full px-4 py-2 rounded-xl bg-white border border-violet-200 focus:ring-2 focus:ring-violet-400 focus:outline-none text-sm font-semibold"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setExtraTexts(prev => prev.filter(t => t.id !== selectedId))
+                        setSelectedId('address')
+                      }}
+                      className="text-xs text-red-600 font-medium flex items-center gap-1 hover:underline pt-1"
+                    >
+                      <span className="material-symbols-outlined text-sm">delete</span> Excluir Texto
+                    </button>
+                  </div>
+                )}
 
                 {/* Address fields */}
                 <div className="lg:col-span-5 lg:col-start-1 lg:row-start-3 order-4 w-full">
@@ -173,8 +320,8 @@ export default function Home() {
                 </div>
 
                 {/* Download */}
-                <div className="lg:col-span-5 lg:col-start-1 lg:row-start-4 order-5 w-full">
-                  <DownloadButton ready={isReady} loading={isDownloading} onDownload={handleDownload} />
+                <div className="lg:col-span-5 lg:col-start-1 lg:row-start-5 order-5 w-full">
+                  <DownloadButton ready={isReady} loading={isDownloading} onDownload={handleDownload} onShare={handleShare} />
                 </div>
               </>
             ) : null}

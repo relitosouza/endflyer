@@ -3,14 +3,41 @@
 interface Props {
   color: string
   fontSize: number
+  fontFamily: string
+  textAlign: 'left' | 'center' | 'right'
   onColorChange: (color: string) => void
   onFontSizeChange: (size: number) => void
+  onFontFamilyChange: (font: string) => void
+  onTextAlignChange: (align: 'left' | 'center' | 'right') => void
+  onAddText?: () => void
   onReset: () => void
 }
 
-export function StyleControls({ color, fontSize, onColorChange, onFontSizeChange, onReset }: Props) {
+export function StyleControls({
+  color,
+  fontSize,
+  fontFamily,
+  textAlign,
+  onColorChange,
+  onFontSizeChange,
+  onFontFamilyChange,
+  onTextAlignChange,
+  onAddText,
+  onReset,
+}: Props) {
   return (
     <div className="flex flex-wrap gap-3 items-center pt-1">
+      {onAddText && (
+        <button
+          type="button"
+          onClick={onAddText}
+          className="flex items-center gap-1 bg-primary-fixed text-primary font-semibold rounded-xl px-3 py-2 text-sm hover:bg-primary-container hover:text-on-primary transition-colors"
+        >
+          <span className="material-symbols-outlined text-[18px]">add_box</span>
+          Adicionar Texto
+        </button>
+      )}
+
       <div className="flex items-center gap-2 bg-surface-container rounded-xl px-3 py-2">
         <span className="material-symbols-outlined text-[18px] text-outline">palette</span>
         <span className="text-sm text-on-surface-variant font-medium">Cor</span>
@@ -35,6 +62,36 @@ export function StyleControls({ color, fontSize, onColorChange, onFontSizeChange
           className="w-12 text-center bg-transparent border-none text-sm font-semibold focus:outline-none"
         />
         <span className="text-xs text-outline">px</span>
+      </div>
+
+      <div className="flex items-center gap-2 bg-surface-container rounded-xl px-3 py-2">
+        <span className="material-symbols-outlined text-[18px] text-outline">font_download</span>
+        <select
+          value={fontFamily}
+          onChange={(e) => onFontFamilyChange(e.target.value)}
+          className="bg-transparent border-none text-sm font-semibold focus:outline-none cursor-pointer"
+        >
+          <option value="Plus Jakarta Sans">Plus Jakarta Sans</option>
+          <option value="Arial">Arial</option>
+          <option value="Impact">Impact</option>
+          <option value="Montserrat">Montserrat</option>
+          <option value="Roboto">Roboto</option>
+        </select>
+      </div>
+
+      <div className="flex items-center gap-2 bg-surface-container rounded-xl px-3 py-2">
+        <span className="material-symbols-outlined text-[18px] text-outline">
+          {textAlign === 'left' ? 'format_align_left' : textAlign === 'right' ? 'format_align_right' : 'format_align_center'}
+        </span>
+        <select
+          value={textAlign}
+          onChange={(e) => onTextAlignChange(e.target.value as 'left' | 'center' | 'right')}
+          className="bg-transparent border-none text-sm font-semibold focus:outline-none cursor-pointer"
+        >
+          <option value="left">Esquerda</option>
+          <option value="center">Centro</option>
+          <option value="right">Direita</option>
+        </select>
       </div>
 
       <button

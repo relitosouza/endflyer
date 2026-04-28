@@ -39,7 +39,7 @@ export function AddressForm({ values, onChange }: Props) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-gutter">
       <div className="md:col-span-2">
-        <Field id="nome" label="Nome" icon="person" placeholder="Ex: João da Silva" value={values.nome} bold onChange={onChange} />
+        <Field id="nome" label="Igreja:" icon="church" placeholder="Ex: Igreja Central" value={values.nome} bold onChange={onChange} />
       </div>
       <Field id="rua" label="Rua / Logradouro" icon="map" placeholder="Ex: Rua das Flores" value={values.rua} onChange={onChange} />
       <Field id="numero" label="Número" icon="tag" placeholder="123" value={values.numero} onChange={onChange} />

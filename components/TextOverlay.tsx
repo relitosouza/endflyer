@@ -30,6 +30,8 @@ export function TextOverlay({ nome, rua, numero, color, fontSize, fontFamily, te
   fontSizeRef.current = fontSize
   const onFontSizeChangeRef = useRef(onFontSizeChange)
   onFontSizeChangeRef.current = onFontSizeChange
+  const onClickRef = useRef(onClick)
+  onClickRef.current = onClick
 
   const initialPinchDist = useRef<number>(0)
   const initialFontSizeState = useRef<number>(0)
@@ -73,6 +75,8 @@ export function TextOverlay({ nome, rua, numero, color, fontSize, fontFamily, te
 
     function onTouchStart(e: TouchEvent) {
       if (!containerRef.current) return
+      
+      onClickRef.current?.()
       
       initialPinchDist.current = 0
       

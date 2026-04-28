@@ -37,44 +37,7 @@ export default function Home() {
     }
   }, [])
 
-  // Load draft on mount
-  useEffect(() => {
-    const saved = localStorage.getItem('flyer_draft')
-    if (saved) {
-      try {
-        const data = JSON.parse(saved)
-        if (data.address) setAddress(prev => ({ ...prev, ...data.address }))
-        if (data.color) setColor(data.color)
-        if (data.fontSize) setFontSize(data.fontSize)
-        if (data.fontFamily) setFontFamily(data.fontFamily)
-        if (data.textAlign) setTextAlign(data.textAlign)
-        if (data.position) setPosition(data.position)
-        if (data.extraTexts) setExtraTexts(data.extraTexts)
-        if (data.imageSrc) setImageSrc(data.imageSrc)
-      } catch (e) {
-        console.error('Erro ao carregar rascunho', e)
-      }
-    }
-  }, [])
 
-  // Save draft on update
-  useEffect(() => {
-    const data = {
-      address,
-      color,
-      fontSize,
-      fontFamily,
-      textAlign,
-      position,
-      extraTexts,
-      imageSrc
-    }
-    try {
-      localStorage.setItem('flyer_draft', JSON.stringify(data))
-    } catch (e) {
-      console.warn('Could not save draft to localStorage. LocalStorage limit might be exceeded.', e)
-    }
-  }, [address, color, fontSize, fontFamily, textAlign, position, extraTexts, imageSrc])
 
   async function handleFile(file: File | null) {
     if (blobUrlRef.current) {

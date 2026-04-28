@@ -116,10 +116,10 @@ export function TextOverlay({ nome, rua, numero, color, fontSize, fontFamily, te
         fontFamily: fontFamily,
         textAlign: textAlign
       }}
-      className={`cursor-grab active:cursor-grabbing select-none px-2 py-1 border-2 rounded-md transition-all
+      className={`cursor-grab active:cursor-grabbing select-none px-3 py-1.5 border-2 rounded-xl transition-all
         ${isSelected 
-          ? 'border-violet-600 bg-violet-500/20 shadow-md z-30' 
-          : 'border-dashed border-[rgba(109,63,207,0.7)] bg-[rgba(109,63,207,0.06)]'
+          ? 'border-violet-600 bg-transparent z-30' 
+          : 'border-transparent bg-transparent hover:border-violet-300/50'
         }`}
     >
       <div style={{ fontWeight: 700, fontSize: `${fontSize}px`, color, lineHeight: 1.2, whiteSpace: 'nowrap' }}>

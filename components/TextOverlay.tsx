@@ -9,6 +9,8 @@ interface Props {
   color: string
   fontSize: number
   fontFamily: string
+  textAlign: 'left' | 'center' | 'right'
+  position: Position
   onDrag: (pos: Position) => void
   containerRef: React.RefObject<HTMLDivElement>
   isSelected?: boolean

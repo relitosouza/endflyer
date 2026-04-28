@@ -61,19 +61,20 @@ export function FlyerPreview({
         {position ? 'Arraste para ajustar a posição' : 'Clique no flyer para posicionar o endereço'}
       </label>
 
-      <div
-        ref={containerRef}
-        data-testid="flyer-canvas"
-        onClick={handleClick}
-        className="relative rounded-2xl overflow-hidden shadow-[0px_4px_24px_rgba(93,46,192,0.12)] border border-[#EFEFEF]"
-        style={{ cursor: position ? 'default' : 'crosshair' }}
-      >
-        <img
-          data-testid="flyer-image"
-          src={imageSrc}
-          alt="Flyer"
-          className="w-full block rounded-2xl"
-        />
+      <div className="relative rounded-2xl overflow-hidden shadow-[0px_4px_24px_rgba(93,46,192,0.12)] border border-[#EFEFEF]">
+        <div
+          ref={containerRef}
+          data-testid="flyer-canvas"
+          onClick={handleClick}
+          className="relative"
+          style={{ cursor: position ? 'default' : 'crosshair' }}
+        >
+          <img
+            data-testid="flyer-image"
+            src={imageSrc}
+            alt="Flyer"
+            className="w-full block"
+          />
 
         {!position ? (
           <div
@@ -115,6 +116,7 @@ export function FlyerPreview({
             containerRef={containerRef as React.RefObject<HTMLDivElement>}
           />
         ))}
+        </div>
       </div>
     </div>
   )

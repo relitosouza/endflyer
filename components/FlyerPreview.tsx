@@ -63,7 +63,7 @@ export function FlyerPreview({
 
       <div
         ref={containerRef}
-        data-testid="flyer-wrapper"
+        data-testid="flyer-canvas"
         onClick={handleClick}
         className="relative rounded-2xl overflow-hidden shadow-[0px_4px_24px_rgba(93,46,192,0.12)] border border-[#EFEFEF]"
         style={{ cursor: position ? 'default' : 'crosshair' }}

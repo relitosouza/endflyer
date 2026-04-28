@@ -23,8 +23,8 @@ export async function shareAsImage(element: HTMLElement, filename = 'flyer.png')
     try {
       await navigator.share({
         files: [file],
-        title: 'Meu Flyer',
-        text: 'Confira meu flyer criado no FlyerLocal!',
+        title: 'EndFlyer',
+        text: 'Confira meu Folheto criado no EndFlyer',
       })
     } catch (error) {
       console.error('Share failed', error)

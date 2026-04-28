@@ -153,13 +153,20 @@ export default function Home() {
   async function handleDownload() {
     if (!flyerWrapperRef.current || isDownloading) return
     setIsDownloading(true)
-    const overlayEls = flyerWrapperRef.current.querySelectorAll<HTMLElement>('[data-testid="text-overlay"]')
+    
+    const canvasEl = flyerWrapperRef.current.querySelector<HTMLElement>('[data-testid="flyer-canvas"]')
+    if (!canvasEl) {
+      setIsDownloading(false)
+      return
+    }
+
+    const overlayEls = canvasEl.querySelectorAll<HTMLElement>('[data-testid="text-overlay"]')
     overlayEls.forEach(el => {
       el.style.border = 'none'
       el.style.background = 'transparent'
     })
     try {
-      await exportAsImage(flyerWrapperRef.current)
+      await exportAsImage(canvasEl)
     } finally {
       overlayEls.forEach(el => {
         el.style.border = ''
@@ -173,13 +180,20 @@ export default function Home() {
     const { shareAsImage } = await import('@/lib/export')
     if (!flyerWrapperRef.current || isDownloading) return
     setIsDownloading(true)
-    const overlayEls = flyerWrapperRef.current.querySelectorAll<HTMLElement>('[data-testid="text-overlay"]')
+
+    const canvasEl = flyerWrapperRef.current.querySelector<HTMLElement>('[data-testid="flyer-canvas"]')
+    if (!canvasEl) {
+      setIsDownloading(false)
+      return
+    }
+
+    const overlayEls = canvasEl.querySelectorAll<HTMLElement>('[data-testid="text-overlay"]')
     overlayEls.forEach(el => {
       el.style.border = 'none'
       el.style.background = 'transparent'
     })
     try {
-      await shareAsImage(flyerWrapperRef.current)
+      await shareAsImage(canvasEl)
     } finally {
       overlayEls.forEach(el => {
         el.style.border = ''
@@ -195,26 +209,16 @@ export default function Home() {
       <header className="bg-white/80 backdrop-blur-md sticky top-0 z-40 border-b border-slate-100 shadow-sm">
         <div className="flex justify-between items-center w-full px-4 sm:px-6 py-3 sm:py-4 max-w-[1200px] mx-auto">
           <div className="flex items-center gap-8">
-            <div className="text-xl font-extrabold text-violet-700 tracking-tight">FlyerLocal</div>
+            <div className="text-xl font-extrabold text-violet-700 tracking-tight">EndFlyer</div>
             <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
               <a href="#" className="hover:text-violet-700 transition-colors">Início</a>
               <a href="#" className="text-violet-700 bg-violet-50 px-3 py-1.5 rounded-lg transition-colors">Criar</a>
-              <a href="#" className="hover:text-violet-700 transition-colors">Meus Flyers</a>
             </nav>
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
             <button className="p-2 text-slate-500 hover:bg-slate-50 rounded-full transition-colors" type="button" aria-label="Notificações">
               <span className="material-symbols-outlined">notifications</span>
             </button>
-            <button className="hidden md:flex items-center gap-2 hover:bg-slate-50 px-2 py-1.5 rounded-full transition-colors" type="button">
-              <div className="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center">
-                <span className="material-symbols-outlined text-primary text-[18px]">person</span>
-              </div>
-              <span className="text-sm font-medium text-slate-700 pr-2">Perfil</span>
-            </button>
-            <div className="md:hidden w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center">
-              <span className="material-symbols-outlined text-primary text-[18px]">person</span>
-            </div>
           </div>
         </div>
       </header>

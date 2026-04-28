@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          "surface-container-lowest": "#ffffff",
+          "on-surface-variant": "#494454",
+          "surface-container-low": "#f6f3f2",
+          "primary-container": "#5d2ec0",
+          "on-primary": "#ffffff",
+          "primary": "#4501a9",
+          "primary-fixed": "#e9ddff",
+          "on-surface": "#1c1b1b",
+          "surface-container": "#f0edec",
+          "outline-variant": "#cbc3d6",
+          "outline": "#7a7485",
+          "tertiary-fixed": "#c2e8ff",
+          "tertiary-container": "#005774",
+          "on-tertiary-fixed": "#001e2b",
+        }
+      }
+    }
+  }
+</script>
+<style>
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  body { background-color: #fcf9f8; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+  /* Text overlay draggable */
+  #text-overlay {
+    position: absolute;
+    cursor: grab;
+    user-select: none;
+    padding: 6px 10px;
+    border: 2px dashed rgba(109,63,207,0.6);
+    border-radius: 8px;
+    background: rgba(109,63,207,0.08);
+    left: 50px;
+    top: 60%;
+    transform: translateY(-50%);
+  }
+  #text-overlay:active { cursor: grabbing; }
+  #text-overlay.placed { border-color: rgba(109,63,207,0.4); }
+
+  /* Flyer container click hint */
+  #flyer-container { cursor: crosshair; }
+  #flyer-container.has-overlay { cursor: default; }
+
+  .click-hint {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(69,1,169,0.04);
+    border-radius: 12px;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .click-hint.hidden { opacity: 0; }
+</style>
+</head>
+<body class="text-on-background min-h-screen pb-24">
+
+<!-- TopAppBar -->
+<header class="bg-white/80 backdrop-blur-md sticky top-0 z-40 border-b border-slate-100 shadow-sm">
+  <div class="flex items-center w-full px-4 py-3 max-w-7xl mx-auto gap-3">
+    <button class="p-2 text-slate-500 hover:bg-slate-50 rounded-full" onclick="history.back()">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </button>
+    <div class="text-xl font-extrabold text-violet-700 font-['Plus_Jakarta_Sans'] tracking-tight flex-1">
+      Posicionar Endereço
+    </div>
+    <button id="download-btn" class="flex items-center gap-2 bg-[#5d2ec0] text-white font-semibold text-sm px-4 py-2 rounded-xl shadow hover:bg-[#4501a9] transition-all">
+      <span class="material-symbols-outlined text-[18px]">download</span>
+      Baixar
+    </button>
+  </div>
+</header>
+
+<main class="max-w-2xl mx-auto px-4 pt-6 pb-8">
+
+  <!-- Instruction chip -->
+  <div id="instruction-chip" class="flex items-center gap-2 bg-[#e9ddff] text-[#4501a9] text-sm font-semibold px-4 py-2 rounded-full w-fit mx-auto mb-4">
+    <span class="material-symbols-outlined text-[18px]">touch_app</span>
+    Clique no flyer para posicionar o endereço
+  </div>
+
+  <!-- Flyer container -->
+  <div class="relative rounded-2xl overflow-hidden shadow-[0px_4px_24px_rgba(93,46,192,0.12)] border border-[#EFEFEF]" style="aspect-ratio: 9/16; background: #1e1b2e;">
+
+    <!-- Simulated flyer background -->
+    <div id="flyer-container" class="absolute inset-0" onclick="placeOverlay(event)">
+      <!-- Fake flyer design for mockup -->
+      <div style="position:absolute;inset:0;background:linear-gradient(160deg,#1a0050 0%,#3d0099 40%,#7c3aed 70%,#c084fc 100%);"></div>
+      <div style="position:absolute;top:10%;left:50%;transform:translateX(-50%);text-align:center;color:white;">
+        <div style="font-size:28px;font-weight:800;font-family:'Plus Jakarta Sans';">GRANDE</div>
+        <div style="font-size:40px;font-weight:800;font-family:'Plus Jakarta Sans';color:#f0abfc;">PROMOÇÃO</div>
+        <div style="font-size:14px;margin-top:8px;opacity:0.8;">Este sábado, das 9h às 18h</div>
+      </div>
+      <div style="position:absolute;bottom:25%;left:50%;transform:translateX(-50%);text-align:center;color:rgba(255,255,255,0.6);font-size:11px;">
+        Exemplo de flyer
+      </div>
+
+      <!-- Click hint overlay -->
+      <div class="click-hint" id="click-hint">
+        <span class="material-symbols-outlined text-[#7c3aed] text-5xl mb-2" style="opacity:0.6;">touch_app</span>
+        <span style="color:rgba(255,255,255,0.7);font-size:13px;font-weight:600;">Clique para posicionar</span>
+      </div>
+
+      <!-- Draggable text overlay (hidden until click) -->
+      <div id="text-overlay" style="display:none;">
+        <div id="overlay-name" style="font-family:'Plus Jakarta Sans';font-weight:700;font-size:18px;color:#ffffff;line-height:1.2;">João da Silva</div>
+        <div id="overlay-address" style="font-family:'Plus Jakarta Sans';font-weight:400;font-size:14px;color:#ffffff;line-height:1.4;">Rua das Flores, 123</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Controls bar -->
+  <div class="mt-4 bg-surface-container-lowest rounded-2xl p-4 border border-[#EFEFEF] shadow-sm">
+    <p class="text-xs font-semibold text-on-surface-variant mb-3 uppercase tracking-wide">Ajustes rápidos</p>
+    <div class="flex flex-wrap gap-3 items-center">
+      <div class="flex items-center gap-2 bg-surface-container rounded-xl px-3 py-2">
+        <span class="material-symbols-outlined text-[18px] text-outline">palette</span>
+        <span class="text-sm text-on-surface-variant font-medium">Cor</span>
+        <input type="color" value="#ffffff" class="w-8 h-8 rounded-lg border-none cursor-pointer" oninput="updateColor(this.value)"/>
+      </div>
+      <div class="flex items-center gap-2 bg-surface-container rounded-xl px-3 py-2">
+        <span class="material-symbols-outlined text-[18px] text-outline">format_size</span>
+        <span class="text-sm text-on-surface-variant font-medium">Tamanho</span>
+        <input type="number" value="18" min="10" max="72" class="w-14 text-center bg-transparent border-none text-sm font-semibold text-on-surface focus:outline-none" oninput="updateSize(this.value)"/>
+        <span class="text-xs text-outline">px</span>
+      </div>
+      <button onclick="resetPosition()" class="flex items-center gap-1 bg-surface-container rounded-xl px-3 py-2 text-sm text-on-surface-variant hover:bg-surface-container-high transition-colors">
+        <span class="material-symbols-outlined text-[18px]">replay</span>
+        Reposicionar
+      </button>
+    </div>
+  </div>
+
+  <!-- Info tip -->
+  <div class="mt-4 bg-tertiary-fixed/30 rounded-xl p-3 flex gap-3 items-start">
+    <span class="material-symbols-outlined text-tertiary-container mt-0.5 text-[18px]">drag_pan</span>
+    <p class="text-xs text-on-tertiary-fixed opacity-80 font-medium">Arraste o bloco de endereço para qualquer posição no flyer. Quando estiver satisfeito, clique em <strong>Baixar</strong>.</p>
+  </div>
+</main>
+
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pt-3 pb-6 bg-white/90 backdrop-blur-lg border-t border-slate-100 shadow-[0px_-4px_20px_rgba(93,46,192,0.06)] z-50 rounded-t-[24px]">
+  <a class="flex flex-col items-center text-slate-400 text-[11px] font-medium hover:text-violet-600" href="#">
+    <span class="material-symbols-outlined">home</span><span>Início</span>
+  </a>
+  <a class="flex flex-col items-center text-violet-700 bg-violet-50 rounded-xl px-3 py-1 text-[11px] font-medium" href="#">
+    <span class="material-symbols-outlined">add_box</span><span>Criar</span>
+  </a>
+  <a class="flex flex-col items-center text-slate-400 text-[11px] font-medium hover:text-violet-600" href="#">
+    <span class="material-symbols-outlined">library_books</span><span>Meus Flyers</span>
+  </a>
+  <a class="flex flex-col items-center text-slate-400 text-[11px] font-medium hover:text-violet-600" href="#">
+    <span class="material-symbols-outlined">person</span><span>Perfil</span>
+  </a>
+</nav>
+
+<script>
+  let isDragging = false;
+  let dragOffsetX = 0;
+  let dragOffsetY = 0;
+  const overlay = document.getElementById('text-overlay');
+  const container = document.getElementById('flyer-container');
+  const hint = document.getElementById('click-hint');
+  const chip = document.getElementById('instruction-chip');
+
+  function placeOverlay(e) {
+    if (isDragging) return;
+    const rect = container.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    overlay.style.display = 'block';
+    overlay.style.left = (x - 60) + 'px';
+    overlay.style.top = (y - 20) + 'px';
+    hint.classList.add('hidden');
+    chip.innerHTML = '<span class="material-symbols-outlined text-[18px]">drag_pan</span> Arraste para ajustar a posição';
+  }
+
+  overlay.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    const rect = overlay.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+    dragOffsetX = e.clientX - rect.left;
+    dragOffsetY = e.clientY - rect.top;
+    e.stopPropagation();
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    const containerRect = container.getBoundingClientRect();
+    let x = e.clientX - containerRect.left - dragOffsetX;
+    let y = e.clientY - containerRect.top - dragOffsetY;
+    overlay.style.left = x + 'px';
+    overlay.style.top = y + 'px';
+  });
+
+  document.addEventListener('mouseup', () => { isDragging = false; });
+
+  // Touch support
+  overlay.addEventListener('touchstart', (e) => {
+    isDragging = true;
+    const touch = e.touches[0];
+    const rect = overlay.getBoundingClientRect();
+    dragOffsetX = touch.clientX - rect.left;
+    dragOffsetY = touch.clientY - rect.top;
+    e.stopPropagation();
+    e.preventDefault();
+  }, { passive: false });
+
+  document.addEventListener('touchmove', (e) => {
+    if (!isDragging) return;
+    const touch = e.touches[0];
+    const containerRect = container.getBoundingClientRect();
+    let x = touch.clientX - containerRect.left - dragOffsetX;
+    let y = touch.clientY - containerRect.top - dragOffsetY;
+    overlay.style.left = x + 'px';
+    overlay.style.top = y + 'px';
+    e.preventDefault();
+  }, { passive: false });
+
+  document.addEventListener('touchend', () => { isDragging = false; });
+
+  function updateColor(val) {
+    document.getElementById('overlay-name').style.color = val;
+    document.getElementById('overlay-address').style.color = val;
+  }
+
+  function updateSize(val) {
+    document.getElementById('overlay-name').style.fontSize = val + 'px';
+  }
+
+  function resetPosition() {
+    overlay.style.display = 'none';
+    hint.classList.remove('hidden');
+    chip.innerHTML = '<span class="material-symbols-outlined text-[18px]">touch_app</span> Clique no flyer para posicionar o endereço';
+  }
+</script>
+</body></html>

@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "surface-container-lowest": "#ffffff",
+          "on-tertiary": "#ffffff",
+          "surface-container-low": "#f6f3f2",
+          "on-surface-variant": "#494454",
+          "surface-container-high": "#ebe7e7",
+          "primary-container": "#5d2ec0",
+          "on-primary": "#ffffff",
+          "primary": "#4501a9",
+          "surface-tint": "#6b3fcf",
+          "inverse-primary": "#d0bcff",
+          "on-tertiary-fixed-variant": "#004d67",
+          "on-surface": "#1c1b1b",
+          "on-primary-container": "#cdb8ff",
+          "tertiary-fixed-dim": "#75d1ff",
+          "surface": "#fcf9f8",
+          "on-primary-fixed": "#22005c",
+          "tertiary-container": "#005774",
+          "tertiary-fixed": "#c2e8ff",
+          "outline": "#7a7485",
+          "on-background": "#1c1b1b",
+          "surface-container": "#f0edec",
+          "primary-fixed-dim": "#d0bcff",
+          "tertiary": "#003e55",
+          "background": "#fcf9f8",
+          "on-tertiary-fixed": "#001e2b",
+          "primary-fixed": "#e9ddff",
+          "on-tertiary-container": "#69ceff",
+          "surface-dim": "#dcd9d9",
+          "secondary": "#a33800",
+          "on-secondary": "#ffffff",
+          "outline-variant": "#cbc3d6",
+        }
+      }
+    }
+  }
+</script>
+<style>
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  body { background-color: #fcf9f8; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+  #preview-section { display: none; }
+  #preview-section.visible { display: block; }
+
+  #flyer-wrapper {
+    position: relative;
+    display: inline-block;
+    cursor: crosshair;
+    border-radius: 12px;
+    overflow: hidden;
+    width: 100%;
+  }
+  #flyer-wrapper.placed { cursor: default; }
+
+  #flyer-img {
+    width: 100%;
+    display: block;
+    border-radius: 12px;
+  }
+
+  #text-overlay {
+    position: absolute;
+    cursor: grab;
+    user-select: none;
+    padding: 4px 8px;
+    border: 2px dashed rgba(109,63,207,0.7);
+    border-radius: 6px;
+    background: rgba(109,63,207,0.06);
+    display: none;
+    min-width: 80px;
+  }
+  #text-overlay:active { cursor: grabbing; }
+
+  .click-hint-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(69,1,169,0.03);
+    border-radius: 12px;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .click-hint-overlay.hidden { opacity: 0; pointer-events: none; }
+</style>
+</head>
+<body class="text-on-background min-h-screen pb-32">
+
+<!-- TopAppBar -->
+<header class="bg-white/80 backdrop-blur-md sticky top-0 z-40 border-b border-slate-100 shadow-sm">
+  <div class="flex justify-between items-center w-full px-6 py-4 max-w-7xl mx-auto">
+    <div class="text-xl font-extrabold text-violet-700 font-['Plus_Jakarta_Sans'] tracking-tight">FlyerLocal</div>
+    <div class="flex items-center gap-4">
+      <button class="p-2 text-slate-500 hover:bg-slate-50 transition-colors rounded-full">
+        <span class="material-symbols-outlined">notifications</span>
+      </button>
+      <img alt="Perfil" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3hE8yD_-fjStcE7PNGxN7kP_qhGeT-kAe5tUvXuVCzfoZkIstCyBF0uqxfhDAJ-gnz2p5QFRfVcjICPKAOgpT1a0cR0Mli8PJAockb00JYkV7rGYZb0T2eLYqhkplhqinE3PRAjdxXN3aRdMpf6waB76ZcrZ2ddvIWqju_uFrTOuJmt0RUTnbfsFmj7ALcsQ1OLVPbDBoIC7FmNZXx97_8aVjWVkR-8G_hLvFiBSOoP4yL4AK0OMIsT_P880hyskNzVr32bKYRUY"/>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-2xl mx-auto px-6 pt-12">
+  <!-- Header -->
+  <div class="mb-10 text-center">
+    <h1 class="font-h1 text-h1 text-on-surface mb-2">Criar seu Flyer</h1>
+    <p class="font-body-md text-body-md text-on-surface-variant">Transforme seu evento local em um flyer profissional em segundos.</p>
+  </div>
+
+  <!-- Form Card -->
+  <div class="bg-surface-container-lowest rounded-[1.5rem] p-8 shadow-[0px_4px_20px_rgba(93,46,192,0.06)] border border-[#EFEFEF]">
+    <form class="space-y-8" onsubmit="return false;">
+
+      <!-- ① Upload Area -->
+      <div class="space-y-3">
+        <label class="font-label-md text-label-md text-on-surface-variant">Imagem do Flyer</label>
+        <div id="upload-zone" class="relative group cursor-pointer border-2 border-dashed border-outline-variant rounded-xl p-10 bg-surface-container-low hover:bg-surface-container-lowest transition-all duration-300 flex flex-col items-center justify-center text-center">
+          <input id="file-input" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full" type="file" accept=".jpg,.jpeg,.png,.pdf" onchange="handleFile(this)"/>
+          <div class="w-16 h-16 bg-primary-fixed rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+            <span class="material-symbols-outlined text-primary text-3xl">upload_file</span>
+          </div>
+          <h3 class="font-h3 text-h3 text-on-surface mb-1">Arraste sua arte aqui</h3>
+          <p class="font-caption text-caption text-outline">JPG, PNG ou PDF (Máx. 5MB)</p>
+        </div>
+        <!-- File selected indicator (hidden until file chosen) -->
+        <div id="file-chosen" class="hidden flex items-center gap-3 bg-primary-fixed rounded-xl px-4 py-3">
+          <span class="material-symbols-outlined text-primary">check_circle</span>
+          <span id="file-name" class="text-sm font-semibold text-primary flex-1 truncate">flyer-evento.jpg</span>
+          <button type="button" onclick="removeFile()" class="text-primary hover:text-[#4501a9]">
+            <span class="material-symbols-outlined text-[18px]">close</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ② Preview + Positioning (aparece após upload) -->
+      <div id="preview-section" class="space-y-3">
+        <label class="font-label-md text-label-md text-on-surface-variant flex items-center gap-2">
+          <span class="material-symbols-outlined text-[18px] text-primary">touch_app</span>
+          Clique no flyer para posicionar o endereço
+        </label>
+        <div id="flyer-wrapper" onclick="placeText(event)">
+          <!-- Flyer simulado (rosa/roxo para demonstração) -->
+          <div id="flyer-img" style="aspect-ratio:9/16;background:linear-gradient(160deg,#1a0050 0%,#3d0099 40%,#7c3aed 70%,#c084fc 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;">
+            <div style="text-align:center;color:white;padding:20px;">
+              <div style="font-size:32px;font-weight:800;">GRANDE</div>
+              <div style="font-size:48px;font-weight:800;color:#f0abfc;">PROMOÇÃO</div>
+              <div style="font-size:14px;margin-top:8px;opacity:0.7;">Este sábado, das 9h às 18h</div>
+            </div>
+          </div>
+          <!-- Hint overlay -->
+          <div class="click-hint-overlay" id="click-hint">
+            <span class="material-symbols-outlined text-5xl text-white/70 mb-2">touch_app</span>
+            <span class="text-white/80 text-sm font-semibold bg-black/30 px-3 py-1 rounded-full">Clique para posicionar</span>
+          </div>
+          <!-- Draggable text block -->
+          <div id="text-overlay">
+            <div id="ov-nome" style="font-weight:700;font-size:18px;color:#ffffff;line-height:1.2;white-space:nowrap;">João da Silva</div>
+            <div id="ov-rua" style="font-weight:400;font-size:14px;color:#ffffff;line-height:1.4;white-space:nowrap;">Rua das Flores, 123</div>
+          </div>
+        </div>
+        <!-- Ajustes rápidos -->
+        <div class="flex flex-wrap gap-3 items-center pt-1">
+          <div class="flex items-center gap-2 bg-surface-container rounded-xl px-3 py-2">
+            <span class="material-symbols-outlined text-[18px] text-outline">palette</span>
+            <span class="text-sm text-on-surface-variant font-medium">Cor</span>
+            <input type="color" value="#ffffff" class="w-8 h-8 rounded-lg border-none cursor-pointer" oninput="updateColor(this.value)"/>
+          </div>
+          <div class="flex items-center gap-2 bg-surface-container rounded-xl px-3 py-2">
+            <span class="material-symbols-outlined text-[18px] text-outline">format_size</span>
+            <input type="number" value="18" min="10" max="72" class="w-12 text-center bg-transparent border-none text-sm font-semibold focus:outline-none" oninput="updateSize(this.value)"/>
+            <span class="text-xs text-outline">px</span>
+          </div>
+          <button type="button" onclick="resetOverlay()" class="flex items-center gap-1 bg-surface-container rounded-xl px-3 py-2 text-sm text-on-surface-variant hover:bg-surface-container-high transition-colors">
+            <span class="material-symbols-outlined text-[18px]">replay</span>Reposicionar
+          </button>
+        </div>
+      </div>
+
+      <!-- ③ Campos de endereço -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+        <!-- Nome -->
+        <div class="space-y-2 md:col-span-2">
+          <label class="font-label-md text-label-md text-on-surface-variant" for="nome">Nome</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">person</span>
+            <input class="w-full pl-12 pr-4 py-3 bg-surface-container rounded-xl border-none focus:ring-2 focus:ring-primary-container text-body-md font-bold transition-all" id="nome" placeholder="Ex: João da Silva" type="text" oninput="updateOverlay()"/>
+          </div>
+        </div>
+        <!-- Rua -->
+        <div class="space-y-2 md:col-span-1">
+          <label class="font-label-md text-label-md text-on-surface-variant" for="rua">Rua / Logradouro</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">map</span>
+            <input class="w-full pl-12 pr-4 py-3 bg-surface-container rounded-xl border-none focus:ring-2 focus:ring-primary-container text-body-md transition-all" id="rua" placeholder="Ex: Rua das Flores" type="text" oninput="updateOverlay()"/>
+          </div>
+        </div>
+        <!-- Número -->
+        <div class="space-y-2 md:col-span-1">
+          <label class="font-label-md text-label-md text-on-surface-variant" for="numero">Número</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">tag</span>
+            <input class="w-full pl-12 pr-4 py-3 bg-surface-container rounded-xl border-none focus:ring-2 focus:ring-primary-container text-body-md transition-all" id="numero" placeholder="123" type="text" oninput="updateOverlay()"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- ④ Botão Download (ativo só quando tudo preenchido) -->
+      <div class="pt-4">
+        <button id="download-btn" class="w-full bg-primary-container text-on-primary font-label-md text-[16px] py-4 rounded-xl shadow-lg hover:shadow-xl hover:bg-primary transition-all flex items-center justify-center gap-3 group opacity-50 cursor-not-allowed" disabled>
+          Gerar Flyer para Download
+          <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">download</span>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Tip -->
+  <div class="mt-8 bg-tertiary-fixed/30 rounded-xl p-4 flex gap-4 items-start">
+    <span class="material-symbols-outlined text-tertiary-container mt-1">info</span>
+    <div class="space-y-1">
+      <p class="font-label-md text-on-tertiary-fixed text-[14px]">Como funciona</p>
+      <p class="font-caption text-on-tertiary-fixed-variant opacity-80">Faça o upload do flyer, preencha os campos e clique na imagem para posicionar o endereço. Arraste para ajustar. Depois clique em <strong>Gerar Flyer para Download</strong>.</p>
+    </div>
+  </div>
+</main>
+
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pt-3 pb-6 bg-white/90 backdrop-blur-lg border-t border-slate-100 shadow-[0px_-4px_20px_rgba(93,46,192,0.06)] z-50 rounded-t-[24px]">
+  <a class="flex flex-col items-center text-slate-400 text-[11px] font-medium hover:text-violet-600" href="#">
+    <span class="material-symbols-outlined">home</span><span>Início</span>
+  </a>
+  <a class="flex flex-col items-center text-violet-700 bg-violet-50 rounded-xl px-3 py-1 text-[11px] font-medium" href="#">
+    <span class="material-symbols-outlined">add_box</span><span>Criar</span>
+  </a>
+  <a class="flex flex-col items-center text-slate-400 text-[11px] font-medium hover:text-violet-600" href="#">
+    <span class="material-symbols-outlined">library_books</span><span>Meus Flyers</span>
+  </a>
+  <a class="flex flex-col items-center text-slate-400 text-[11px] font-medium hover:text-violet-600" href="#">
+    <span class="material-symbols-outlined">person</span><span>Perfil</span>
+  </a>
+</nav>
+
+<script>
+  let isDragging = false, dragOffsetX = 0, dragOffsetY = 0;
+  const overlay = document.getElementById('text-overlay');
+  const wrapper = document.getElementById('flyer-wrapper');
+  const hint = document.getElementById('click-hint');
+
+  // Simula upload de arquivo
+  function handleFile(input) {
+    if (!input.files.length) return;
+    const file = input.files[0];
+    document.getElementById('file-name').textContent = file.name;
+    document.getElementById('file-chosen').classList.remove('hidden');
+    document.getElementById('file-chosen').classList.add('flex');
+    document.getElementById('preview-section').classList.add('visible');
+    checkReady();
+  }
+
+  function removeFile() {
+    document.getElementById('file-input').value = '';
+    document.getElementById('file-chosen').classList.add('hidden');
+    document.getElementById('file-chosen').classList.remove('flex');
+    document.getElementById('preview-section').classList.remove('visible');
+    overlay.style.display = 'none';
+    hint.classList.remove('hidden');
+    checkReady();
+  }
+
+  function placeText(e) {
+    if (isDragging) return;
+    const rect = wrapper.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    overlay.style.display = 'block';
+    overlay.style.left = (x - 60) + 'px';
+    overlay.style.top = (y - 20) + 'px';
+    hint.classList.add('hidden');
+    wrapper.style.cursor = 'default';
+    checkReady();
+  }
+
+  // Drag
+  overlay.addEventListener('mousedown', e => {
+    isDragging = true;
+    const r = overlay.getBoundingClientRect();
+    dragOffsetX = e.clientX - r.left;
+    dragOffsetY = e.clientY - r.top;
+    e.stopPropagation(); e.preventDefault();
+  });
+  document.addEventListener('mousemove', e => {
+    if (!isDragging) return;
+    const r = wrapper.getBoundingClientRect();
+    overlay.style.left = (e.clientX - r.left - dragOffsetX) + 'px';
+    overlay.style.top = (e.clientY - r.top - dragOffsetY) + 'px';
+  });
+  document.addEventListener('mouseup', () => { isDragging = false; });
+
+  function updateOverlay() {
+    const nome = document.getElementById('nome').value || 'Nome';
+    const rua = document.getElementById('rua').value || 'Rua';
+    const num = document.getElementById('numero').value || 'Nº';
+    document.getElementById('ov-nome').textContent = nome;
+    document.getElementById('ov-rua').textContent = rua + ', ' + num;
+    checkReady();
+  }
+
+  function updateColor(v) {
+    document.getElementById('ov-nome').style.color = v;
+    document.getElementById('ov-rua').style.color = v;
+  }
+
+  function updateSize(v) {
+    document.getElementById('ov-nome').style.fontSize = v + 'px';
+  }
+
+  function resetOverlay() {
+    overlay.style.display = 'none';
+    hint.classList.remove('hidden');
+    wrapper.style.cursor = 'crosshair';
+    checkReady();
+  }
+
+  function checkReady() {
+    const hasFile = document.getElementById('file-input').files.length > 0;
+    const hasNome = document.getElementById('nome').value.trim();
+    const hasRua = document.getElementById('rua').value.trim();
+    const hasNum = document.getElementById('numero').value.trim();
+    const hasPosition = overlay.style.display === 'block';
+    const btn = document.getElementById('download-btn');
+    if (hasFile && hasNome && hasRua && hasNum && hasPosition) {
+      btn.disabled = false;
+      btn.classList.remove('opacity-50', 'cursor-not-allowed');
+    } else {
+      btn.disabled = true;
+      btn.classList.add('opacity-50', 'cursor-not-allowed');
+    }
+  }
+</script>
+</body></html>

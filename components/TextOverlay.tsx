@@ -15,9 +15,10 @@ interface Props {
   containerRef: React.RefObject<HTMLDivElement>
   isSelected?: boolean
   onClick?: () => void
+  onFontSizeChange?: (size: number) => void
 }
 
-export function TextOverlay({ nome, rua, numero, color, fontSize, fontFamily, textAlign, position, onDrag, containerRef, isSelected, onClick }: Props) {
+export function TextOverlay({ nome, rua, numero, color, fontSize, fontFamily, textAlign, position, onDrag, containerRef, isSelected, onClick, onFontSizeChange }: Props) {
   const dragOffset = useRef({ x: 0, y: 0 })
   const overlayRef = useRef<HTMLDivElement>(null)
   // Keep refs to latest values so the passive touchstart handler always uses current data
@@ -25,6 +26,13 @@ export function TextOverlay({ nome, rua, numero, color, fontSize, fontFamily, te
   positionRef.current = position
   const onDragRef = useRef(onDrag)
   onDragRef.current = onDrag
+  const fontSizeRef = useRef(fontSize)
+  fontSizeRef.current = fontSize
+  const onFontSizeChangeRef = useRef(onFontSizeChange)
+  onFontSizeChangeRef.current = onFontSizeChange
+
+  const initialPinchDist = useRef<number>(0)
+  const initialFontSizeState = useRef<number>(0)
 
   function handleMouseDown(e: React.MouseEvent) {
     if (!containerRef.current) return
@@ -65,33 +73,71 @@ export function TextOverlay({ nome, rua, numero, color, fontSize, fontFamily, te
 
     function onTouchStart(e: TouchEvent) {
       if (!containerRef.current) return
-      const touch = e.touches[0]
-      const rect = containerRef.current.getBoundingClientRect()
-      const currentX = (positionRef.current.x / 100) * rect.width
-      const currentY = (positionRef.current.y / 100) * rect.height
-      dragOffset.current = {
-        x: (touch.clientX - rect.left) - currentX,
-        y: (touch.clientY - rect.top) - currentY,
+      
+      initialPinchDist.current = 0
+      
+      if (e.touches.length === 1) {
+        const touch = e.touches[0]
+        const rect = containerRef.current.getBoundingClientRect()
+        const currentX = (positionRef.current.x / 100) * rect.width
+        const currentY = (positionRef.current.y / 100) * rect.height
+        dragOffset.current = {
+          x: (touch.clientX - rect.left) - currentX,
+          y: (touch.clientY - rect.top) - currentY,
+        }
       }
+      
       e.stopPropagation()
       e.preventDefault()
 
       function onTouchMove(ev: TouchEvent) {
         if (!containerRef.current) return
-        const t = ev.touches[0]
-        const r = containerRef.current.getBoundingClientRect()
-        const absX = t.clientX - r.left - dragOffset.current.x
-        const absY = t.clientY - r.top - dragOffset.current.y
-        onDragRef.current({
-          x: (absX / r.width) * 100,
-          y: (absY / r.height) * 100,
-        })
-        ev.preventDefault()
+        
+        if (ev.touches.length === 2 && onFontSizeChangeRef.current) {
+          const touch1 = ev.touches[0]
+          const touch2 = ev.touches[1]
+          const dist = Math.hypot(touch2.clientX - touch1.clientX, touch2.clientY - touch1.clientY)
+          
+          if (initialPinchDist.current === 0) {
+            initialPinchDist.current = dist
+            initialFontSizeState.current = fontSizeRef.current
+          } else {
+            const factor = dist / initialPinchDist.current
+            const newSize = Math.round(initialFontSizeState.current * factor)
+            const clampedSize = Math.max(10, Math.min(100, newSize))
+            onFontSizeChangeRef.current(clampedSize)
+          }
+          ev.preventDefault()
+        } else if (ev.touches.length === 1) {
+          const t = ev.touches[0]
+          const r = containerRef.current.getBoundingClientRect()
+          const absX = t.clientX - r.left - dragOffset.current.x
+          const absY = t.clientY - r.top - dragOffset.current.y
+          onDragRef.current({
+            x: (absX / r.width) * 100,
+            y: (absY / r.height) * 100,
+          })
+          ev.preventDefault()
+        }
       }
 
-      function onTouchEnd() {
-        document.removeEventListener('touchmove', onTouchMove)
-        document.removeEventListener('touchend', onTouchEnd)
+      function onTouchEnd(ev: TouchEvent) {
+        if (ev.touches.length === 0) {
+          document.removeEventListener('touchmove', onTouchMove)
+          document.removeEventListener('touchend', onTouchEnd)
+        } else if (ev.touches.length === 1) {
+          if (containerRef.current) {
+            const touch = ev.touches[0]
+            const rect = containerRef.current.getBoundingClientRect()
+            const currentX = (positionRef.current.x / 100) * rect.width
+            const currentY = (positionRef.current.y / 100) * rect.height
+            dragOffset.current = {
+              x: (touch.clientX - rect.left) - currentX,
+              y: (touch.clientY - rect.top) - currentY,
+            }
+          }
+          initialPinchDist.current = 0
+        }
       }
 
       document.addEventListener('touchmove', onTouchMove, { passive: false })

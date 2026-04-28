@@ -113,6 +113,7 @@ export function FlyerPreview({
             isSelected={selectedId === text.id}
             onClick={() => onSelect(text.id)}
             onDrag={(pos) => onUpdateExtraText(text.id, { position: pos })}
+            onFontSizeChange={(size) => onUpdateExtraText(text.id, { fontSize: size })}
             containerRef={containerRef as React.RefObject<HTMLDivElement>}
           />
         ))}

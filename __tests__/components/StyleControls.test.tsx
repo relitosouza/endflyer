@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { StyleControls } from '@/components/StyleControls'
 
@@ -8,12 +8,12 @@ describe('StyleControls', () => {
     expect(screen.getByTestId('color-picker')).toHaveValue('#ffffff')
   })
 
-  it('chama onColorChange ao mudar cor', async () => {
+  it('chama onColorChange ao mudar cor', () => {
     const onColorChange = jest.fn()
     render(<StyleControls color="#ffffff" fontSize={18} onColorChange={onColorChange} onFontSizeChange={jest.fn()} onReset={jest.fn()} />)
     const picker = screen.getByTestId('color-picker')
-    await userEvent.type(picker, '#ff0000')
-    expect(onColorChange).toHaveBeenCalled()
+    fireEvent.change(picker, { target: { value: '#ff0000' } })
+    expect(onColorChange).toHaveBeenCalledWith('#ff0000')
   })
 
   it('chama onReset ao clicar em Reposicionar', async () => {

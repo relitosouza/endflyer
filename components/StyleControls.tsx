@@ -16,7 +16,7 @@ export function StyleControls({ color, fontSize, onColorChange, onFontSizeChange
         <span className="text-sm text-on-surface-variant font-medium">Cor</span>
         <input
           data-testid="color-picker"
-          type="text"
+          type="color"
           value={color}
           onChange={(e) => onColorChange(e.target.value)}
           className="w-20 h-8 rounded-lg border-none cursor-pointer text-xs font-mono px-1"

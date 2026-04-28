@@ -1,5 +1,5 @@
 'use client'
-import { useRef } from 'react'
+import React, { useRef } from 'react'
 import { TextOverlay } from './TextOverlay'
 import type { Position } from '@/hooks/useDrag'
 
@@ -20,11 +20,12 @@ interface Props {
 }
 
 export function FlyerPreview({ imageSrc, position, onPlace, onDrag, overlayProps }: Props) {
-  const containerRef = useRef<HTMLDivElement>(null!)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   function handleClick(e: React.MouseEvent<HTMLDivElement>) {
     if (!containerRef.current) return
     const rect = containerRef.current.getBoundingClientRect()
+    // Offset by half the overlay's approximate width/height so the click lands in the center of the text block
     onPlace({ x: e.clientX - rect.left - 60, y: e.clientY - rect.top - 20 })
   }
 
@@ -64,7 +65,7 @@ export function FlyerPreview({ imageSrc, position, onPlace, onDrag, overlayProps
             {...overlayProps}
             position={position}
             onDrag={onDrag}
-            containerRef={containerRef}
+            containerRef={containerRef as React.RefObject<HTMLDivElement>}
           />
         )}
       </div>
